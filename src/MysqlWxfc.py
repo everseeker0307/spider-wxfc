@@ -3,6 +3,7 @@
 
 import pymysql
 import time
+from log import logger
 
 class MysqlWxfc:
     def openDB(self, ip='localhost', username='root', password='333', db='wxfc'):
