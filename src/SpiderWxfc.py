@@ -11,7 +11,7 @@ class SpiderWxfc:
 
     def getPageContent(self, url='http://www.wxhouse.com:9097/wwzs/getzxlpxx.action'):
         '''获取首页源代码'''
-        headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'}
+        headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36', 'Connection': 'close'}
         try:
             r = requests.get(url, headers = headers)
             r.close()
@@ -22,16 +22,19 @@ class SpiderWxfc:
 
     def postPageContent(self, url='http://www.wxhouse.com:9097/wwzs/getzxlpxx.action', currentPageNo='1', pageSize='15'):
         '''获取指定页面源代码，默认currentPageNo=1时与getPageContent函数结果一致'''
-        headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36'}
+        headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36', 'Connection': 'close'}
         data = {'page.currentPageNo': currentPageNo, 'page.pageSize': pageSize}
-        print('currentPageNo:', currentPageNo)
-        try:
-            r = requests.post(url, headers = headers, data = data)
-            r.close()
-            r.encoding = r.apparent_encoding
-            return r.text
-        except Exception as e:
-            raise
+        while (True):
+            try:
+                r = requests.post(url, headers = headers, data = data)
+                r.close()
+                if (r.status_code == 200):
+                    print('currentPageNo:', currentPageNo)
+                    r.encoding = r.apparent_encoding
+                    return r.text
+            except Exception as e:
+                print(e)
+                time.sleep(5)
 
     def getHousesInfo(self, pageContent):
         '''
@@ -66,7 +69,7 @@ class SpiderWxfc:
         totalHouseNum = self.getHouseNum(pageContent)
         mysqlWxfc = MysqlWxfc()
         newHouseNum = totalHouseNum - mysqlWxfc.getHouseNum()
-        print('今日新增楼盘数量:', newHouseNum)
+        print('today new houseNum:', newHouseNum)
         if (newHouseNum > 0):
             totalPageNum = self.getPageNum(pageContent)
             pageIter = 0

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pymysql
+import time
 
 class MysqlWxfc:
     def openDB(self, ip='localhost', username='root', password='333', db='wxfc'):
@@ -20,14 +21,16 @@ class MysqlWxfc:
         db = self.openDB()
         cursor = db.cursor()
         sql = "insert into houseinfo(id, name, total, licence, createdate) values({0}, '{1}', {2}, '{3}', '{4}')".format(record[0], record[1], record[2], record[3], record[4])
-        try:
-            cursor.execute(sql)
-            db.commit()
-        except Exception as e:
-            db.rollback()
-            raise
-        finally:
-            db.close()
+        while (True):
+            try:
+                cursor.execute(sql)
+                db.commit()
+                db.close()
+                return
+            except Exception as e:
+                print(e)
+                db.rollback()
+                time.sleep(2)
 
     def saveManyToDailyTable(self, records):
         '''批量记录存入数据库'''
@@ -38,13 +41,15 @@ class MysqlWxfc:
             # alter table dailyinfo add unique index (house_id, date)
             sql = "insert into dailyinfo(id, house_id, forsale, date) values('{0}', {1}, {2}, '{3}') on duplicate key update forsale={4}".format(record[0], record[1], record[2], record[3], record[2])
             cursor.execute(sql)
-        try:
-            db.commit()
-        except Exception as e:
-            db.rollback()
-            raise
-        finally:
-            db.close()
+        while (True):
+            try:
+                db.commit()
+                db.close()
+                return
+            except Exception as e:
+                print(e)
+                db.rollback()
+                time.sleep(2)
 
     def isExistHouseInfoById(self, id):
         '''根据id查询楼盘是否存在'''
