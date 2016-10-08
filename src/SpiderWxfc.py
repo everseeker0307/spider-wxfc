@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+#!/usr/local/bin/python3
+# coding:utf-8
+
 import requests
 import re
 from concurrent.futures import ThreadPoolExecutor
@@ -6,6 +8,7 @@ import time
 from MysqlWxfc import MysqlWxfc
 from datetime import date
 import uuid
+from log import logger
 
 class SpiderWxfc:
 
@@ -18,6 +21,7 @@ class SpiderWxfc:
             r.encoding = r.apparent_encoding
             return r.text
         except Exception as e:
+            logger.error(e)
             raise
 
     def postPageContent(self, url='http://www.wxhouse.com:9097/wwzs/getzxlpxx.action', currentPageNo='1', pageSize='15'):
@@ -29,11 +33,12 @@ class SpiderWxfc:
                 r = requests.post(url, headers = headers, data = data)
                 r.close()
                 if (r.status_code == 200):
-                    print('currentPageNo:', currentPageNo)
+                    # print('currentPageNo:', currentPageNo)
                     r.encoding = r.apparent_encoding
                     return r.text
             except Exception as e:
-                print(e)
+                logger.warning('An exception occurs when open a web page: {}'.format(data))
+                logger.warning(e)
                 time.sleep(5)
 
     def getHousesInfo(self, pageContent):
@@ -69,7 +74,7 @@ class SpiderWxfc:
         totalHouseNum = self.getHouseNum(pageContent)
         mysqlWxfc = MysqlWxfc()
         newHouseNum = totalHouseNum - mysqlWxfc.getHouseNum()
-        print('today new houseNum:', newHouseNum)
+        logger.info('today new houseNum: {}'.format(newHouseNum))
         if (newHouseNum > 0):
             totalPageNum = self.getPageNum(pageContent)
             pageIter = 0
@@ -96,6 +101,7 @@ class SpiderWxfc:
         mysqlWxfc.saveManyToDailyTable(records)
 
 if __name__ == '__main__':
+    start = time.time()
     wxfc = SpiderWxfc()
     # 1、将每日新增楼盘信息存入数据库
     indexPage = wxfc.getPageContent()
@@ -108,3 +114,5 @@ if __name__ == '__main__':
         pageIter = pageIter + 1
         pool.submit(wxfc.saveToDailyTable, currentPageNo = str(pageIter))
         time.sleep(1)
+    end = time.time()
+    logger.info('it costs time {}s'.format(end - start))

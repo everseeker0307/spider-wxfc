@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+#!/usr/local/bin/python3
+# coding:utf-8
+
 import pymysql
 import time
 
@@ -28,7 +30,7 @@ class MysqlWxfc:
                 db.close()
                 return
             except Exception as e:
-                print(e)
+                logger.warning(e)
                 db.rollback()
                 time.sleep(2)
 
@@ -47,7 +49,7 @@ class MysqlWxfc:
                 db.close()
                 return
             except Exception as e:
-                print(e)
+                logger.warning(e)
                 db.rollback()
                 time.sleep(2)
 
