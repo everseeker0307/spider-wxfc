@@ -3,6 +3,8 @@
 
 import pymysql
 import time
+from datetime import date
+from datetime import timedelta
 from log import logger
 
 class MysqlWxfc:
@@ -18,6 +20,41 @@ class MysqlWxfc:
         data = cursor.fetchone()
         db.close()
         return data[0]
+
+    def getStock(self, date):
+        '''获得截止到date那天的库存总量'''
+        db = self.openDB()
+        cursor = db.cursor()
+        cursor.execute('select forsale from dailyinfo where date = \'{}\''.format(date))
+        data = cursor.fetchall()
+        db.close()
+        stock = 0
+        for eachStock in data:
+            stock = stock + eachStock[0]
+        return stock
+
+    def getDailyVOL(self, dt):
+        '''获得date那天的成交量'''
+        the_day = dt
+        if isinstance(dt, str):
+            t_s_year, t_s_mon, t_s_day = dt.split('-')
+            the_day = date(int(t_s_year), int(t_s_mon), int(t_s_day))
+        previous_day = the_day - timedelta(days = 1)
+        db = self.openDB()
+        cursor = db.cursor()
+        # 查询每个楼盘前一天和当天库存，格式为(楼盘id，'楼盘名称'，'前一天库存, 当天库存')
+        sql = 'select d.house_id, h.name, group_concat(d.forsale order by d.date asc) from dailyinfo d join houseinfo h on d.date in (\'{}\', \'{}\') and h.id=d.house_id group by d.house_id order by d.house_id desc'.format(previous_day, the_day)
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        db.close()
+        dailyVOL = []
+        for each in data:
+            stock = each[2].split(',')
+            if len(stock) == 2:
+                vol = int(stock[0]) - int(stock[1])
+                if vol != 0:
+                    dailyVOL.append((each[0], each[1], vol))
+        return dailyVOL
 
     def saveSingleToHouseTable(self, record):
         '''单条记录存入数据库'''
