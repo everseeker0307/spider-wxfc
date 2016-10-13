@@ -61,9 +61,25 @@ class MysqlWxfc:
         db = self.openDB()
         cursor = db.cursor()
         sql = "insert into houseinfo(id, name, total, licence, createdate) values({0}, '{1}', {2}, '{3}', '{4}')".format(record[0], record[1], record[2], record[3], record[4])
-        while (True):
+        while True:
             try:
                 cursor.execute(sql)
+                db.commit()
+                db.close()
+                return
+            except Exception as e:
+                logger.warning(e)
+                db.rollback()
+                time.sleep(2)
+
+    def saveToDailySecondTable(self, record):
+        '''每日二手房成交量存入数据表secdailyinfo'''
+        db = self.openDB()
+        cursor = db.cursor()
+        sql = "insert into secdailyinfo(date, vol, area) values('{0}', {1}, {2}) on duplicate key update vol={1} and area={2}".format(record[0], record[1], record[2])
+        cursor.execute(sql)
+        while True:
+            try:
                 db.commit()
                 db.close()
                 return
@@ -81,7 +97,7 @@ class MysqlWxfc:
             # alter table dailyinfo add unique index (house_id, date)
             sql = "insert into dailyinfo(id, house_id, forsale, date) values('{0}', {1}, {2}, '{3}') on duplicate key update forsale={4}".format(record[0], record[1], record[2], record[3], record[2])
             cursor.execute(sql)
-        while (True):
+        while True:
             try:
                 db.commit()
                 db.close()
