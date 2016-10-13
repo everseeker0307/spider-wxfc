@@ -115,4 +115,5 @@ if __name__ == '__main__':
         pool.submit(wxfc.saveToDailyTable, currentPageNo = str(pageIter))
         time.sleep(1)
     end = time.time()
+    # 计算的时间是把所有任务加入线程池中的时间，而不是所有任务已经完成的时间
     logger.info('it costs time {}s'.format(end - start))

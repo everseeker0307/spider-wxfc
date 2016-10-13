@@ -34,7 +34,7 @@ class MysqlWxfc:
         return stock
 
     def getDailyVOL(self, dt):
-        '''获得date那天的成交量'''
+        '''获得date那天的成交量: [id, name, vol]'''
         the_day = dt
         if isinstance(dt, str):
             t_s_year, t_s_mon, t_s_day = dt.split('-')

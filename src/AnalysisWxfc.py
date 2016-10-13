@@ -36,8 +36,12 @@ class AnalysisWxfc:
         '''获得date那天的详细成交信息'''
         dailyVOL = self.wxfc.getDailyVOL(date)
         # 排序打印, 从大到小排序
+        dailyVOLNum = 0
         for each in sorted(dailyVOL, key = lambda record: record[2], reverse = True):
             print(each)
+            if each[2] > 0:
+                dailyVOLNum = dailyVOLNum + each[2]
+        print('\ntoday VOL num: {}'.format(dailyVOLNum))
 
 if __name__ == '__main__':
     ana = AnalysisWxfc()
@@ -47,5 +51,5 @@ if __name__ == '__main__':
     for daily in result:
         print('{}    {}'.format(daily[0], daily[1]))
     # 每日成交详情
-    print('today VOL: ')
+    print('\ntoday VOL details: ')
     ana.getDailyVOL(date.today())
