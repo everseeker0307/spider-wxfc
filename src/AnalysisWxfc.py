@@ -33,14 +33,19 @@ class AnalysisWxfc:
         return result
 
     def getDailyVOL(self, date):
+        '''获得date那天的详细成交信息'''
         dailyVOL = self.wxfc.getDailyVOL(date)
-        # 排序
+        # 排序打印, 从大到小排序
         for each in sorted(dailyVOL, key = lambda record: record[2], reverse = True):
             print(each)
 
 if __name__ == '__main__':
     ana = AnalysisWxfc()
-    # result = ana.getPeriodStock('2016-09-28', date.today())
-    # for daily in result:
-    #     print('{}    {}'.format(daily[0], daily[1]))
-    ana.getDailyVOL('2016-10-10')
+    # 总库存
+    print('all stocks: ')
+    result = ana.getPeriodStock('2016-09-28', date.today())
+    for daily in result:
+        print('{}    {}'.format(daily[0], daily[1]))
+    # 每日成交详情
+    print('today VOL: ')
+    ana.getDailyVOL(date.today())
