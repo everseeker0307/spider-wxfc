@@ -76,7 +76,7 @@ class MysqlWxfc:
         '''每日二手房成交量存入数据表secdailyinfo'''
         db = self.openDB()
         cursor = db.cursor()
-        sql = "insert into secdailyinfo(date, vol, area) values('{0}', {1}, {2}) on duplicate key update vol={1} and area={2}".format(record[0], record[1], record[2])
+        sql = "insert into secdailyinfo(date, vol, area) values('{0}', {1}, {2}) on duplicate key update vol={1}, area={2}".format(record[0], record[1], record[2], record[1], record[2])
         cursor.execute(sql)
         while True:
             try:
