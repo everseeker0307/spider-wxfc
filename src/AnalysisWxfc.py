@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 # coding:utf-8
 
+import sys
 from MysqlWxfc import MysqlWxfc
 from datetime import date
 from datetime import timedelta
@@ -52,4 +53,7 @@ if __name__ == '__main__':
         print('{}    {}'.format(daily[0], daily[1]))
     # 每日成交详情
     print('\ntoday VOL details: ')
-    ana.getDailyVOL(date.today())
+    if len(sys.argv) == 2:
+        ana.getDailyVOL(sys.argv[1])
+    else:
+        ana.getDailyVOL(date.today())

@@ -107,7 +107,7 @@ if __name__ == '__main__':
     indexPage = wxfc.getPageContent()
     wxfc.saveToHouseTable(indexPage)
     # 2、将每日可售数量存入数据库
-    pool = ThreadPoolExecutor(10)
+    pool = ThreadPoolExecutor(50)
     totalPageNum = wxfc.getPageNum(indexPage)
     pageIter = 0
     while (pageIter < totalPageNum):
