@@ -88,6 +88,17 @@ class MysqlWxfc:
                 db.rollback()
                 time.sleep(2)
 
+    def getSecondVOL(self):
+        '''查询最近10日的二手房成交量'''
+        db = self.openDB()
+        cursor = db.cursor()
+        sql = "select * from secdailyinfo order by date desc limit 10"
+        cursor.execute(sql)
+        data = cursor.fetchall()
+        db.close()
+        vol = [each for each in data]
+        return vol
+
     def saveManyToDailyTable(self, records):
         '''批量记录存入数据库'''
         db = self.openDB()

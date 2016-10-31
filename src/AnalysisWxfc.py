@@ -44,6 +44,12 @@ class AnalysisWxfc:
                 dailyVOLNum = dailyVOLNum + each[2]
         print('\ntoday VOL num: {}'.format(dailyVOLNum))
 
+    def getSecondVOL(self):
+        '''查询最近10日的二手房成交量'''
+        secVOL = self.wxfc.getSecondVOL()
+        for each in secVOL:
+            print(each)
+
 if __name__ == '__main__':
     ana = AnalysisWxfc()
     # 总库存
@@ -57,3 +63,6 @@ if __name__ == '__main__':
         ana.getDailyVOL(sys.argv[1])
     else:
         ana.getDailyVOL(date.today())
+    # 最近10日二手房成交量
+    print('\nsecond VOL: ')
+    ana.getSecondVOL()
