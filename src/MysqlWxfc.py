@@ -22,7 +22,9 @@ class MysqlWxfc:
         return data[0]
 
     def getStock(self, date):
-        '''获得截止到date那天的库存总量'''
+        '''获得截止到date那天的库存总量.
+        select sum(forsale) from dailyinfo where date=date即可.
+        '''
         db = self.openDB()
         cursor = db.cursor()
         cursor.execute('select forsale from dailyinfo where date = \'{}\''.format(date))
